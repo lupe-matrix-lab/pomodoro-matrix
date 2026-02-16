@@ -2,7 +2,9 @@
 
 ## Phase 1: Persistence & Desktop (Completed)
 - [x] LocalStorage persistence (survives refreshes).
+- [x] Auto-resume on reload (if timer was running).
 - [x] Python Wrapper (desktop app via `pywebview`).
+- [x] Cross-platform build setup (PyInstaller).
 
 ## Phase 2: Arduino/Physical Device
 - [ ] **Hardware:** Arduino Nano/ESP32 + OLED Display + Buzzer.
