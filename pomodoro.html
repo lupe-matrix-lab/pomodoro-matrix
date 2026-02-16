@@ -132,32 +132,41 @@
         function loadState() {
             const saved = localStorage.getItem('pomodoro_matrix_state');
             if (saved) {
-                const state = JSON.parse(saved);
-                currentMode = state.currentMode;
-                intervalsDone = state.intervalsDone;
-                
-                // Calculate if we should subtract time spent away
-                let timePassed = 0;
-                if (state.isRunning) {
-                    timePassed = Math.floor((Date.now() - state.lastUpdate) / 1000);
-                }
-                
-                timeLeft = Math.max(0, state.timeLeft - timePassed);
-                
-                // Update UI tabs
-                document.querySelectorAll('.btn-matrix').forEach(btn => btn.classList.remove('active-tab'));
-                document.getElementById(currentMode + 'Tab').classList.add('active-tab');
-                statusLabel.textContent = configs[currentMode].label;
-                
-                updateDisplay();
+                try {
+                    const state = JSON.parse(saved);
+                    currentMode = state.currentMode || 'pomodoro';
+                    intervalsDone = state.intervalsDone || 0;
+                    
+                    let timePassed = 0;
+                    if (state.isRunning && state.lastUpdate) {
+                        timePassed = Math.floor((Date.now() - state.lastUpdate) / 1000);
+                    }
+                    
+                    timeLeft = Number(state.timeLeft);
+                    if (isNaN(timeLeft)) {
+                        const input = document.getElementById(configs[currentMode].inputId);
+                        timeLeft = (input ? Number(input.value) : 25) * 60;
+                    } else {
+                        timeLeft = Math.max(0, timeLeft - timePassed);
+                    }
+                    
+                    document.querySelectorAll('.btn-matrix').forEach(btn => btn.classList.remove('active-tab'));
+                    const tab = document.getElementById(currentMode + 'Tab');
+                    if (tab) tab.classList.add('active-tab');
+                    statusLabel.textContent = configs[currentMode].label;
+                    
+                    updateDisplay();
 
-                if (state.isRunning && timeLeft > 0) {
-                    startTimer();
-                } else if (state.isRunning && timeLeft <= 0) {
-                    finishInterval();
+                    if (state.isRunning && timeLeft > 0) {
+                        startTimer();
+                    } else if (state.isRunning && timeLeft <= 0) {
+                        finishInterval();
+                    }
+                    return true;
+                } catch (e) {
+                    console.error("Failed to load state", e);
+                    return false;
                 }
-                
-                return true;
             }
             return false;
         }
@@ -185,25 +194,29 @@
 
         function init() {
             if (!loadState()) {
-                timeLeft = document.getElementById(configs[currentMode].inputId).value * 60;
+                const input = document.getElementById(configs[currentMode].inputId);
+                const val = input ? parseInt(input.value) : 25;
+                timeLeft = (isNaN(val) ? 25 : val) * 60;
                 updateDisplay();
             }
         }
 
         function updateDisplay() {
+            if (isNaN(timeLeft)) timeLeft = 25 * 60;
+            
             const mins = Math.floor(timeLeft / 60);
             const secs = timeLeft % 60;
             const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
             timerDisplay.textContent = timeStr;
             document.title = `${timeStr} - ${currentMode.toUpperCase()}`;
             
-            const total = document.getElementById(configs[currentMode].inputId).value * 60;
-            const percentage = (timeLeft / total) * 100;
+            const input = document.getElementById(configs[currentMode].inputId);
+            const total = (input ? parseInt(input.value) : 25) * 60;
+            const percentage = isNaN(total) || total === 0 ? 0 : (timeLeft / total) * 100;
             progressDisplay.style.width = `${percentage}%`;
 
-            // Update interval display: shows current work session number
             let displayInterval = (intervalsDone % 4) + 1;
-            intervalCount.textContent = displayInterval;
+            intervalCount.textContent = isNaN(displayInterval) ? 1 : displayInterval;
         }
 
         function setMode(mode) {
