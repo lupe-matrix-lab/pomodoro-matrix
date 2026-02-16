@@ -186,8 +186,9 @@
             const percentage = (timeLeft / total) * 100;
             progressDisplay.style.width = `${percentage}%`;
 
-            // Update interval display
-            intervalCount.textContent = (intervalsDone % 4) + 1;
+            // Update interval display: shows current work session number
+            let displayInterval = (intervalsDone % 4) + 1;
+            intervalCount.textContent = displayInterval;
         }
 
         function setMode(mode) {
