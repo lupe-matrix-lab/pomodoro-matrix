@@ -62,6 +62,7 @@ jobs:
       - name: Build with PyInstaller (macOS)
         if: matrix.os == 'macos-latest'
         run: |
+          pip install Pillow
           pyinstaller --noconfirm --onefile --windowed \
             --add-data "pomodoro.html:." \
             --add-data "icon.png:." \
