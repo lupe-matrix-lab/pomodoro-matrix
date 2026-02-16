@@ -38,5 +38,7 @@ if __name__ == '__main__':
 
     # Open window
     webview.create_window('Pomodoro Matrix - Lupe Edition', f'http://localhost:{port}/pomodoro.html', 
-                          width=450, height=650, resizable=False)
+                          width=450, height=650, resizable=False,
+                          icon=resource_path("icon.png"))
+    
     webview.start()

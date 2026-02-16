@@ -8,7 +8,11 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 # Build binary
-pyinstaller --noconfirm --onefile --windowed --add-data "pomodoro.html:." --name "PomodoroMatrix" pomodoro_app.py
+pyinstaller --noconfirm --onefile --windowed \
+    --add-data "pomodoro.html:." \
+    --add-data "icon.png:." \
+    --icon "icon.ico" \
+    --name "PomodoroMatrix" pomodoro_app.py
 
 # Cleanup
 deactivate
