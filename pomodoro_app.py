@@ -37,8 +37,7 @@ if __name__ == '__main__':
     port = getattr(server_thread, 'port', 8081)
 
     # Open window
-    webview.create_window('Pomodoro Matrix - Lupe Edition', f'http://localhost:{port}/pomodoro.html', 
-                          width=450, height=650, resizable=False,
-                          icon=resource_path("icon.png"))
+    window = webview.create_window('Pomodoro Matrix - Lupe Edition', f'http://localhost:{port}/pomodoro.html', 
+                          width=450, height=650, resizable=False)
     
     webview.start()
