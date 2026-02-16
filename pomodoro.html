@@ -123,6 +123,7 @@
                 timeLeft,
                 currentMode,
                 intervalsDone,
+                isRunning: timerId !== null,
                 lastUpdate: Date.now()
             };
             localStorage.setItem('pomodoro_matrix_state', JSON.stringify(state));
@@ -134,7 +135,14 @@
                 const state = JSON.parse(saved);
                 currentMode = state.currentMode;
                 intervalsDone = state.intervalsDone;
-                timeLeft = state.timeLeft;
+                
+                // Calculate if we should subtract time spent away
+                let timePassed = 0;
+                if (state.isRunning) {
+                    timePassed = Math.floor((Date.now() - state.lastUpdate) / 1000);
+                }
+                
+                timeLeft = Math.max(0, state.timeLeft - timePassed);
                 
                 // Update UI tabs
                 document.querySelectorAll('.btn-matrix').forEach(btn => btn.classList.remove('active-tab'));
@@ -142,6 +150,13 @@
                 statusLabel.textContent = configs[currentMode].label;
                 
                 updateDisplay();
+
+                if (state.isRunning && timeLeft > 0) {
+                    startTimer();
+                } else if (state.isRunning && timeLeft <= 0) {
+                    finishInterval();
+                }
+                
                 return true;
             }
             return false;
